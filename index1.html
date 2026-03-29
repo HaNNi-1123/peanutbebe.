@@ -126,12 +126,18 @@
 <p class="p1">        });</p>
 <p class="p1">    }</p>
 <p class="p2"><br></p>
-<p class="p1">    function generateTextContent(agent, remitDate, amount, note) {</p>
-<p class="p1">        let formattedAmount = Number(amount).toLocaleString();</p>
-<p class="p1">        let finalString = `🥜 Peanuts.bebe 儲值入帳確認 🥜\n\nHi ${agent}，款項收妥囉！\n----------------------\n● 匯款日期：${remitDate}\n● 入帳金額：NT$ ${formattedAmount}\n● 備註：${note}\n----------------------\n這筆預付款已紀錄。我們用最快的節奏把貨備齊，一起優雅賺錢！✨`;</p>
-<p class="p1">        </p>
-<p class="p1">        document.getElementById('outputText').innerText = finalString;</p>
-<p class="p1">        document.getElementById('resultArea').style.display = 'block';</p>
+function generateTextContent(agent, remitDate, amount, note) {
+        let formattedAmount = Number(amount).toLocaleString();
+        
+        // 這裡就是產出給代理複製回傳的文案
+        let finalString = `🥜 Peanuts.bebe 匯款回報單 🥜\n\n闆娘，我已完成儲值匯款囉！\n----------------------\n● 代理編號：${agent}\n● 匯款日期：${remitDate}\n● 匯款金額：NT$ ${formattedAmount}\n● 帳號末五碼：${note}\n----------------------\n請記得將此訊息【截圖】或【複製】回傳給闆娘核對喔！✨`;
+        
+        document.getElementById('outputText').innerText = finalString;
+        document.getElementById('resultArea').style.display = 'block';
+        
+        // 這裡是按鈕按下去後的彈窗提醒
+        alert('文案已產出！請記得「點擊下方按鈕」複製文案，並回傳給闆娘喔！');
+    }
 <p class="p1">    }</p>
 <p class="p2"><br></p>
 <p class="p1">    function copyToClipboard() {</p>
