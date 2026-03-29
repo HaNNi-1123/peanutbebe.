@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;div style="font-family:'PingFang TC', 'Microsoft JhengHei', sans-serif; background:#fdfaf6; padding:20px; min-height:100vh; display:flex; justify-content:center; color:#4e342e;"&gt;</p>
+<p class="p1">    &lt;div style="background:#fff; padding:35px; border-radius:20px; width:100%; max-width:420px; box-shadow:0 10px 25px rgba(0,0,0,0.05); box-sizing:border-box; position:relative;"&gt;</p>
+<p class="p1">        </p>
+<p class="p1">        &lt;div id="loadingOverlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); border-radius:20px; z-index:10; justify-content:center; align-items:center; flex-direction:column;"&gt;</p>
+<p class="p1">            &lt;div style="font-size:24px; margin-bottom:10px;"&gt;⏳&lt;/div&gt;</p>
+<p class="p1">            &lt;div style="font-weight:bold; color:#8d6e63;"&gt;資料同步中，請稍候...&lt;/div&gt;</p>
+<p class="p1">        &lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">        &lt;h2 style="text-align:center; color:#8d6e63; letter-spacing:2px; margin-bottom:30px; margin-top:0;"&gt;🥜 Peanuts.bebe &lt;br&gt;自動化入帳系統&lt;/h2&gt;</p>
+<p class="p1">        </p>
+<p class="p1">        &lt;label style="display:block; font-size:15px; margin-bottom:10px; font-weight:bold;"&gt;代理編號&lt;/label&gt;</p>
+<p class="p1">        &lt;select id="agentSelect" style="width:100%; padding:14px; margin-bottom:20px; border:2px solid #d7ccc8; border-radius:12px; font-size:16px; background:#fff; outline:none; color:#4e342e; cursor:pointer;"&gt;</p>
+<p class="p1">            &lt;option value=""&gt;-- 點擊選擇編號 --&lt;/option&gt;</p>
+<p class="p1">            &lt;script&gt;</p>
+<p class="p1">                const agentSelect = document.getElementById('agentSelect');</p>
+<p class="p1">                for(let i=1; i&lt;=21; i++) {</p>
+<p class="p1">                    let num = i.toString().padStart(3, '0');</p>
+<p class="p1">                    let opt = document.createElement('option');</p>
+<p class="p1">                    opt.value = `doudou${num}`;</p>
+<p class="p1">                    opt.innerText = `doudou${num}`;</p>
+<p class="p1">                    agentSelect.appendChild(opt);</p>
+<p class="p1">                }</p>
+<p class="p1">            &lt;/script&gt;</p>
+<p class="p1">        &lt;/select&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">        &lt;label style="display:block; font-size:15px; margin-bottom:10px; font-weight:bold;"&gt;匯款日期&lt;/label&gt;</p>
+<p class="p1">        &lt;select id="dateSelect" style="width:100%; padding:14px; margin-bottom:20px; border:2px solid #d7ccc8; border-radius:12px; font-size:16px; background:#fff; outline:none; color:#4e342e; cursor:pointer;"&gt;</p>
+<p class="p1">            &lt;/select&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">        &lt;label style="display:block; font-size:15px; margin-bottom:10px; font-weight:bold;"&gt;儲值金額 (TWD)&lt;/label&gt;</p>
+<p class="p1">        &lt;input id="amountInput" type="number" placeholder="請輸入匯款數字" style="width:100%; padding:14px; margin-bottom:20px; border:2px solid #d7ccc8; border-radius:12px; box-sizing:border-box; font-size:16px; outline:none; color:#4e342e;"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">        &lt;label style="display:block; font-size:15px; margin-bottom:10px; font-weight:bold;"&gt;備註 (帳號末五碼)&lt;/label&gt;</p>
+<p class="p1">        &lt;input id="noteInput" type="text" placeholder="例如：12345" style="width:100%; padding:14px; margin-bottom:30px; border:2px solid #d7ccc8; border-radius:12px; box-sizing:border-box; font-size:16px; outline:none; color:#4e342e;"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">        &lt;button onclick="processData()" style="width:100%; padding:16px; background:#8d6e63; color:#fff; border:none; border-radius:12px; font-weight:bold; cursor:pointer; font-size:18px; letter-spacing:1px; transition:0.2s;"&gt;一鍵產出並紀錄&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">        &lt;div id="resultArea" style="display:none; margin-top:30px; padding:20px; background:#f5f0eb; border-radius:16px; border-left:6px solid #8d6e63;"&gt;</p>
+<p class="p1">            &lt;div id="outputText" style="white-space:pre-wrap; font-size:15px; line-height:1.6; color:#5d4037; font-weight:500;"&gt;&lt;/div&gt;</p>
+<p class="p1">            &lt;button onclick="copyToClipboard()" style="width:100%; margin-top:20px; padding:12px; background:#fff; border:2px solid #d7ccc8; border-radius:10px; cursor:pointer; font-weight:bold; color:#8d6e63; font-size:15px;"&gt;📋 點擊複製文案&lt;/button&gt;</p>
+<p class="p1">        &lt;/div&gt;</p>
+<p class="p1">        </p>
+<p class="p1">        &lt;div style="margin-top:40px; font-size:13px; color:#a1887f; text-align:center; line-height:1.8; font-weight:bold;"&gt;</p>
+<p class="p1">            不賣焦慮，不走捷徑。&lt;br&gt;只選真正重要的事情做。</p>
+<p class="p1">        &lt;/div&gt;</p>
+<p class="p1">    &lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1">    // 【★★★ 請把下面這串換成妳剛才複製的通道鑰匙網址 ★★★】</p>
+<p class="p1">    // 【★★★ 注意：網址前後的單引號 ' 不要刪掉喔 ★★★】</p>
+<p class="p1">    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtocFv4v1vZYCEu8m1FKiYtsgmf3-3kzl1A9E1U8lzmt_jrh5kItgtpilDm8HnbOKY7g/exec';</p>
+<p class="p2"><br></p>
+<p class="p1">    const dateDropdown = document.getElementById('dateSelect');</p>
+<p class="p1">    const today = new Date();</p>
+<p class="p1">    </p>
+<p class="p1">    for(let i=0; i&lt;7; i++) {</p>
+<p class="p1">        let d = new Date(today);</p>
+<p class="p1">        d.setDate(today.getDate() - i);</p>
+<p class="p1">        let yyyy = d.getFullYear();</p>
+<p class="p1">        let mm = String(d.getMonth() + 1).padStart(2, '0');</p>
+<p class="p1">        let dd = String(d.getDate()).padStart(2, '0');</p>
+<p class="p1">        let dateString = `${yyyy}/${mm}/${dd}`;</p>
+<p class="p1">        </p>
+<p class="p1">        let opt = document.createElement('option');</p>
+<p class="p1">        opt.value = dateString;</p>
+<p class="p1">        if(i === 0) opt.innerText = `${dateString} (今天)`;</p>
+<p class="p1">        else if(i === 1) opt.innerText = `${dateString} (昨天)`;</p>
+<p class="p1">        else opt.innerText = dateString;</p>
+<p class="p1">        dateDropdown.appendChild(opt);</p>
+<p class="p1">    }</p>
+<p class="p2"><br></p>
+<p class="p1">    // 核心處理函數：先送資料到 Google，再產出文案</p>
+<p class="p1">    function processData() {</p>
+<p class="p1">        const agent = document.getElementById('agentSelect').value;</p>
+<p class="p1">        const remitDate = document.getElementById('dateSelect').value;</p>
+<p class="p1">        const amount = document.getElementById('amountInput').value;</p>
+<p class="p1">        const note = document.getElementById('noteInput').value;</p>
+<p class="p2"><br></p>
+<p class="p1">        if(!agent) return alert('親愛的，選個代理編號再按送出。');</p>
+<p class="p1">        if(!amount) return alert('儲值金額總不能是空的吧。');</p>
+<p class="p2"><br></p>
+<p class="p1">        // 開啟 Loading 遮罩</p>
+<p class="p1">        document.getElementById('loadingOverlay').style.display = 'flex';</p>
+<p class="p2"><br></p>
+<p class="p1">        // 整理要送出的包裹</p>
+<p class="p1">        const payload = {</p>
+<p class="p1">            date: remitDate,</p>
+<p class="p1">            agent: agent,</p>
+<p class="p1">            amount: amount,</p>
+<p class="p1">            note: note ? note : '無備註'</p>
+<p class="p1">        };</p>
+<p class="p2"><br></p>
+<p class="p1">        // 呼叫 Google 專屬快遞員</p>
+<p class="p1">        fetch(GOOGLE_SCRIPT_URL, {</p>
+<p class="p1">            method: 'POST',</p>
+<p class="p1">            mode: 'no-cors', // 避免跨網域錯誤的強勢解法</p>
+<p class="p1">            headers: {</p>
+<p class="p1">                'Content-Type': 'application/json'</p>
+<p class="p1">            },</p>
+<p class="p1">            body: JSON.stringify(payload)</p>
+<p class="p1">        })</p>
+<p class="p1">        .then(() =&gt; {</p>
+<p class="p1">            // 不管 Google 回什麼，只要送出去了，我們就立刻產出文案</p>
+<p class="p1">            document.getElementById('loadingOverlay').style.display = 'none';</p>
+<p class="p1">            generateTextContent(agent, remitDate, amount, payload.note);</p>
+<p class="p1">        })</p>
+<p class="p1">        .catch(error =&gt; {</p>
+<p class="p1">            document.getElementById('loadingOverlay').style.display = 'none';</p>
+<p class="p1">            alert('糟糕，同步到試算表時卡住了。但文案還是會幫妳產出喔。');</p>
+<p class="p1">            generateTextContent(agent, remitDate, amount, payload.note);</p>
+<p class="p1">        });</p>
+<p class="p1">    }</p>
+<p class="p2"><br></p>
+<p class="p1">    function generateTextContent(agent, remitDate, amount, note) {</p>
+<p class="p1">        let formattedAmount = Number(amount).toLocaleString();</p>
+<p class="p1">        let finalString = `🥜 Peanuts.bebe 儲值入帳確認 🥜\n\nHi ${agent}，款項收妥囉！\n----------------------\n● 匯款日期：${remitDate}\n● 入帳金額：NT$ ${formattedAmount}\n● 備註：${note}\n----------------------\n這筆預付款已紀錄。我們用最快的節奏把貨備齊，一起優雅賺錢！✨`;</p>
+<p class="p1">        </p>
+<p class="p1">        document.getElementById('outputText').innerText = finalString;</p>
+<p class="p1">        document.getElementById('resultArea').style.display = 'block';</p>
+<p class="p1">    }</p>
+<p class="p2"><br></p>
+<p class="p1">    function copyToClipboard() {</p>
+<p class="p1">        const textToCopy = document.getElementById('outputText').innerText;</p>
+<p class="p1">        navigator.clipboard.writeText(textToCopy).then(() =&gt; {</p>
+<p class="p1">            alert('文案複製成功！資料也已經安穩地躺在妳的試算表裡了。');</p>
+<p class="p1">        });</p>
+<p class="p1">    }</p>
+<p class="p1">&lt;/script&gt;</p>
+</body>
+</html>
