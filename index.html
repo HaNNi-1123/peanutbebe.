@@ -1,0 +1,129 @@
+<div style="font-family:'PingFang TC', 'Microsoft JhengHei', sans-serif; background:#fdfaf6; padding:20px; min-height:100vh; display:flex; justify-content:center; color:#4e342e;">
+    <div style="background:#fff; padding:35px; border-radius:20px; width:100%; max-width:420px; box-shadow:0 10px 25px rgba(0,0,0,0.05); box-sizing:border-box; position:relative;">
+        
+        <div id="loadingOverlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); border-radius:20px; z-index:10; justify-content:center; align-items:center; flex-direction:column;">
+            <div style="font-size:24px; margin-bottom:10px;">⏳</div>
+            <div style="font-weight:bold; color:#8d6e63;">資料同步中，請稍候...</div>
+        </div>
+
+        <h2 style="text-align:center; color:#8d6e63; letter-spacing:2px; margin-bottom:30px; margin-top:0;">🥜 Peanuts.bebe <br>自動化入帳系統</h2>
+        
+        <label style="display:block; font-size:15px; margin-bottom:10px; font-weight:bold;">代理編號</label>
+        <select id="agentSelect" style="width:100%; padding:14px; margin-bottom:20px; border:2px solid #d7ccc8; border-radius:12px; font-size:16px; background:#fff; outline:none; color:#4e342e; cursor:pointer;">
+            <option value="">-- 點擊選擇編號 --</option>
+            <script>
+                const agentSelect = document.getElementById('agentSelect');
+                for(let i=1; i<=21; i++) {
+                    let num = i.toString().padStart(3, '0');
+                    let opt = document.createElement('option');
+                    opt.value = `doudou${num}`;
+                    opt.innerText = `doudou${num}`;
+                    agentSelect.appendChild(opt);
+                }
+            </script>
+        </select>
+
+        <label style="display:block; font-size:15px; margin-bottom:10px; font-weight:bold;">匯款日期</label>
+        <select id="dateSelect" style="width:100%; padding:14px; margin-bottom:20px; border:2px solid #d7ccc8; border-radius:12px; font-size:16px; background:#fff; outline:none; color:#4e342e; cursor:pointer;">
+            </select>
+
+        <label style="display:block; font-size:15px; margin-bottom:10px; font-weight:bold;">儲值金額 (TWD)</label>
+        <input id="amountInput" type="number" placeholder="請輸入匯款數字" style="width:100%; padding:14px; margin-bottom:20px; border:2px solid #d7ccc8; border-radius:12px; box-sizing:border-box; font-size:16px; outline:none; color:#4e342e;">
+
+        <label style="display:block; font-size:15px; margin-bottom:10px; font-weight:bold;">備註 (帳號末五碼)</label>
+        <input id="noteInput" type="text" placeholder="例如：12345" style="width:100%; padding:14px; margin-bottom:30px; border:2px solid #d7ccc8; border-radius:12px; box-sizing:border-box; font-size:16px; outline:none; color:#4e342e;">
+
+        <button onclick="processData()" style="width:100%; padding:16px; background:#8d6e63; color:#fff; border:none; border-radius:12px; font-weight:bold; cursor:pointer; font-size:18px; letter-spacing:1px; transition:0.2s;">一鍵產出並紀錄</button>
+
+        <div id="resultArea" style="display:none; margin-top:30px; padding:20px; background:#f5f0eb; border-radius:16px; border-left:6px solid #8d6e63;">
+            <div id="outputText" style="white-space:pre-wrap; font-size:15px; line-height:1.6; color:#5d4037; font-weight:500;"></div>
+            <button onclick="copyToClipboard()" style="width:100%; margin-top:20px; padding:12px; background:#fff; border:2px solid #d7ccc8; border-radius:10px; cursor:pointer; font-weight:bold; color:#8d6e63; font-size:15px;">📋 點擊複製文案</button>
+        </div>
+        
+        <div style="margin-top:40px; font-size:13px; color:#a1887f; text-align:center; line-height:1.8; font-weight:bold;">
+            不賣焦慮，不走捷徑。<br>只選真正重要的事情做。
+        </div>
+    </div>
+</div>
+
+<script>
+    // 【★★★ 請把下面這串換成妳剛才複製的通道鑰匙網址 ★★★】
+    // 【★★★ 注意：網址前後的單引號 ' 不要刪掉喔 ★★★】
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtocFv4v1vZYCEu8m1FKiYtsgmf3-3kzl1A9E1U8lzmt_jrh5kItgtpilDm8HnbOKY7g/exec';
+
+    const dateDropdown = document.getElementById('dateSelect');
+    const today = new Date();
+    
+    for(let i=0; i<7; i++) {
+        let d = new Date(today);
+        d.setDate(today.getDate() - i);
+        let yyyy = d.getFullYear();
+        let mm = String(d.getMonth() + 1).padStart(2, '0');
+        let dd = String(d.getDate()).padStart(2, '0');
+        let dateString = `${yyyy}/${mm}/${dd}`;
+        
+        let opt = document.createElement('option');
+        opt.value = dateString;
+        if(i === 0) opt.innerText = `${dateString} (今天)`;
+        else if(i === 1) opt.innerText = `${dateString} (昨天)`;
+        else opt.innerText = dateString;
+        dateDropdown.appendChild(opt);
+    }
+
+    // 核心處理函數：先送資料到 Google，再產出文案
+    function processData() {
+        const agent = document.getElementById('agentSelect').value;
+        const remitDate = document.getElementById('dateSelect').value;
+        const amount = document.getElementById('amountInput').value;
+        const note = document.getElementById('noteInput').value;
+
+        if(!agent) return alert('親愛的，選個代理編號再按送出。');
+        if(!amount) return alert('儲值金額總不能是空的吧。');
+
+        // 開啟 Loading 遮罩
+        document.getElementById('loadingOverlay').style.display = 'flex';
+
+        // 整理要送出的包裹
+        const payload = {
+            date: remitDate,
+            agent: agent,
+            amount: amount,
+            note: note ? note : '無備註'
+        };
+
+        // 呼叫 Google 專屬快遞員
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', // 避免跨網域錯誤的強勢解法
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            // 不管 Google 回什麼，只要送出去了，我們就立刻產出文案
+            document.getElementById('loadingOverlay').style.display = 'none';
+            generateTextContent(agent, remitDate, amount, payload.note);
+        })
+        .catch(error => {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            alert('糟糕，同步到試算表時卡住了。但文案還是會幫妳產出喔。');
+            generateTextContent(agent, remitDate, amount, payload.note);
+        });
+    }
+
+    function generateTextContent(agent, remitDate, amount, note) {
+        let formattedAmount = Number(amount).toLocaleString();
+        let finalString = `🥜 Peanuts.bebe 儲值入帳確認 🥜\n\nHi ${agent}，款項收妥囉！\n----------------------\n● 匯款日期：${remitDate}\n● 入帳金額：NT$ ${formattedAmount}\n● 備註：${note}\n----------------------\n這筆預付款已紀錄。我們用最快的節奏把貨備齊，一起優雅賺錢！✨`;
+        
+        document.getElementById('outputText').innerText = finalString;
+        document.getElementById('resultArea').style.display = 'block';
+    }
+
+    function copyToClipboard() {
+        const textToCopy = document.getElementById('outputText').innerText;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert('文案複製成功！資料也已經安穩地躺在妳的試算表裡了。');
+        });
+    }
+</script>
